@@ -8,4 +8,5 @@ edition = "2021"
 [dependencies]
 libc = "0.2.148"
 nix = { version = "0.27.1", features = ["ioctl"] }
+simple_endian = "0.2.1"
 timeout-readwrite = "0.3.3"
