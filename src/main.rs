@@ -1,32 +1,28 @@
+mod setup;
+
 use core::{fmt, slice};
 use simple_endian::*;
 use std::{
-    fs::File,
     io::{self, prelude::*},
     mem::{self, transmute},
     net::Ipv4Addr,
-    os::fd::AsRawFd,
     time::Duration,
 };
 
 use timeout_readwrite::TimeoutReader;
 
+use crate::setup::open_tun;
+
 fn main() -> io::Result<()> {
     let mut tun = open_tun("tun0")?;
 
     // let syn = b"E\x00\x00,\x00\x01\x00\x00@\x06\x00\xc4\xc0\x00\x02\x02\"\xc2\x95Cx\x0c\x00P\xf4p\x98\x8b\x00\x00\x00\x00`\x02\xff\xff\x18\xc6\x00\x00\x02\x04\x05\xb4";
-    // // dbg!(syn.len());
-    // // write!(tun, "{syn}")?;
     // tun.write_all(syn)?;
     // tun.flush()?;
 
-    // dbg!("write successful; about to read");
-
-    // let mut ack = vec![];
-    // tun.read_to_end(&mut ack)?;
-
-    // Handle: Write
-    // &mut Handle: Write
+    // let mut ack = [0u8; 1024];
+    // let n = tun.read(&mut ack)?;
+    // dbg!(&ack[..n], n);
 
     // Step 1.2 -- clean up 'old' data.
     let mut buf = [0u8; 1024];
@@ -95,30 +91,6 @@ fn main() -> io::Result<()> {
 const PROTO_ICMP: u8 = 1;
 const PROTO_TCP: u8 = 6;
 const PROTO_UDP: u8 = 17;
-
-const LINUX_TUNSETIFF: u64 = 0x400454CA;
-
-fn open_tun(tun_name: &str) -> io::Result<File> {
-    let tun = File::options()
-        .read(true)
-        .write(true)
-        .open("/dev/net/tun")?;
-    let flags = libc::IFF_TUN | libc::IFF_NO_PI;
-
-    // 16 bytes (fill in the prefix with the filename) then 2byte flag then 22 bytes NUL
-    let mut ifs = vec![];
-    ifs.extend(tun_name.as_bytes());
-    ifs.extend(vec![0; 16 - tun_name.len()]);
-    ifs.extend(flags.to_le_bytes());
-    ifs.extend(vec![0; 22]);
-
-    let ret = unsafe { libc::ioctl(tun.as_raw_fd(), LINUX_TUNSETIFF, ifs.as_ptr(), ifs.len()) };
-    if ret != 0 {
-        panic!("ioctl non-zero ret: {ret}");
-    }
-
-    Ok(tun)
-}
 
 /// Packet header.
 #[repr(C)]

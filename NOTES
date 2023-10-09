@@ -1,9 +1,21 @@
-* setup FAQ is a lot at once
-* ioctl thing was *hard* in a different language
+typos:
+* Ways to use this guide > Knowledge requirements:
+    "you can starth ere too"
+* 1.3 > 2. IHL:
+    "because they dont changee"
 
-* re-running setup after reboot
-    * is this mentioned in the guide?
+---
 
-1.3:
-* typo: because they dont changee
+Setup:
+* 3. A local HTTP server:
+    `python3 -m http.server --bind 192.0.2.1 8080` didn't work for me initially
+    (could add a note: ~"run `...` after running the setup script")
+* re-running the setup after reboot seems necessary
+    (could note that)
+* FAQ is a lot at once; I was happy skipping it
+* 192.0.2.2 vs 192.0.2.1
+    I don't yet understand which one is for what
+
+Part 0:
+* ioctl was tricky in a different language
 
