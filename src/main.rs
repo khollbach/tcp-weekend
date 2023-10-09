@@ -22,24 +22,14 @@ fn main() -> io::Result<()> {
 
     // let mut ack = [0u8; 1024];
     // let n = tun.read(&mut ack)?;
-    // dbg!(&ack[..n], n);
+    // eprintln!("{:02x?}", &ack[..n]);
 
     // Step 1.2 -- clean up 'old' data.
     let mut buf = [0u8; 1024];
-    let mut tun_reader = TimeoutReader::new(tun.try_clone()?, Duration::from_secs(1));
-    let mut i = 0;
+    let mut tun_reader = TimeoutReader::new(tun.try_clone()?, Duration::from_millis(100));
     while let Ok(n) = tun_reader.read(&mut buf) {
-        dbg!("read", i, n);
-        eprintln!("{:?}", &buf[..n]);
-        i += 1;
+        eprintln!("read {:02x?}", &buf[..n]);
     }
-
-    // dbg!(size_of::<Ipv4>());
-
-    // let ip = Ipv4::new(100, 1, Ipv4Addr::new(127, 0, 0, 1)); // ?
-    // dbg!(ip);
-
-    // ----
 
     let ping = IcmpEcho::ping(0);
     let dst = Ipv4Addr::new(192, 0, 2, 2);
@@ -98,7 +88,7 @@ const PROTO_UDP: u8 = 17;
 struct Ipv4 {
     vers_ihl: u8,
     tos: u8,
-    total_length: u16be, // 201
+    total_length: u16be,
     id: u16be,
     frag_off: u16be,
     ttl: u8,
@@ -144,8 +134,8 @@ impl Ipv4 {
     }
 
     fn from_bytes(bytes: &[u8]) -> Self {
-        assert!(bytes.len() >= 20);
-        unsafe { transmute::<[u8; 20], Self>(bytes[..20].try_into().unwrap()) }
+        assert_eq!(bytes.len(), 20);
+        unsafe { transmute::<[u8; 20], Self>(bytes.try_into().unwrap()) }
     }
 }
 
@@ -234,8 +224,8 @@ impl IcmpEcho {
     }
 
     fn from_bytes(bytes: &[u8]) -> Self {
-        assert!(bytes.len() >= 8);
-        unsafe { transmute::<[u8; 8], Self>(bytes[..8].try_into().unwrap()) }
+        assert_eq!(bytes.len(), 8);
+        unsafe { transmute::<[u8; 8], Self>(bytes.try_into().unwrap()) }
     }
 }
 
@@ -248,6 +238,24 @@ impl Checksummable for IcmpEcho {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn ipv4_to_bytes() {
+        let ipv4 = Ipv4 {
+            vers_ihl: 4 << 4 | 5,
+            tos: 0,
+            total_length: 28.into(),
+            id: 1.into(),
+            frag_off: 0.into(),
+            ttl: 16,
+            protocol: 6,
+            checksum: 0.into(),
+            src: [192,168, 0, 1].into(),
+            dst: [8,8,8,8].into(),
+        };
+        let expected = b"E\x00\x00\x1c\x00\x01\x00\x00\x10\x06\x00\x00\xc0\xa8\x00\x01\x08\x08\x08\x08";
+        assert_eq!(ipv4.as_bytes(), expected);
+    }
 
     #[test]
     fn ipv4_round_trip_bytes() {

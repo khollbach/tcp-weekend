@@ -18,4 +18,11 @@ Setup:
 
 Part 0:
 * ioctl was tricky in a different language
+    Ended up falling down a rabbit-hole re: syscalls
+
+Part 1:
+* 1.3: the "what do these fields mean?" section
+    doesn't exactly correspond to the fields in the python dataclass
+* 1.4: to/from bytestrings:
+    got tripped up by endianness, but we eventually figured it out
 
