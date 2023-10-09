@@ -1,4 +1,4 @@
-use std::{net::Ipv4Addr, fmt, mem};
+use std::{fmt, mem, net::Ipv4Addr};
 
 use simple_endian::u16be;
 
@@ -82,10 +82,11 @@ mod tests {
             ttl: 16,
             protocol: 6,
             checksum: 0.into(),
-            src: [192,168, 0, 1].into(),
-            dst: [8,8,8,8].into(),
+            src: [192, 168, 0, 1].into(),
+            dst: [8, 8, 8, 8].into(),
         };
-        let expected = b"E\x00\x00\x1c\x00\x01\x00\x00\x10\x06\x00\x00\xc0\xa8\x00\x01\x08\x08\x08\x08";
+        let expected =
+            b"E\x00\x00\x1c\x00\x01\x00\x00\x10\x06\x00\x00\xc0\xa8\x00\x01\x08\x08\x08\x08";
         assert_eq!(ipv4.as_bytes(), expected);
     }
 }
