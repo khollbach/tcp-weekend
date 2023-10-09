@@ -1,20 +1,19 @@
 mod setup;
 mod checksum;
 mod ipv4;
+mod icmp_echo;
 
-use core::fmt;
 use checksum::Checksummable;
-use simple_endian::*;
 use std::{
     io::{self, prelude::*},
-    mem::{self, transmute},
+    mem,
     net::Ipv4Addr,
     time::Duration,
 };
 
 use timeout_readwrite::TimeoutReader;
 
-use crate::{setup::open_tun, ipv4::Ipv4};
+use crate::{setup::open_tun, ipv4::Ipv4, icmp_echo::IcmpEcho};
 
 fn main() -> io::Result<()> {
     let mut tun = open_tun("tun0")?;
@@ -84,52 +83,6 @@ fn main() -> io::Result<()> {
 const PROTO_ICMP: u8 = 1;
 const PROTO_TCP: u8 = 6;
 const PROTO_UDP: u8 = 17;
-
-#[repr(C)]
-#[derive(PartialEq, Eq)]
-struct IcmpEcho {
-    type_: u8,
-    code: u8,
-    checksum: u16be,
-    id: u16be,
-    seq: u16be,
-}
-
-impl fmt::Debug for IcmpEcho {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("IcmpEcho")
-            .field("type_", &self.type_)
-            .field("code", &self.code)
-            .field("checksum", &self.checksum.to_native())
-            .field("id", &self.id.to_native())
-            .field("seq", &self.seq.to_native())
-            .finish()
-    }
-}
-
-impl IcmpEcho {
-    fn ping(seq: u16) -> Self {
-        Self {
-            type_: 8,
-            code: 0,
-            checksum: 0.into(),
-            id: 12345.into(),
-            seq: seq.into(),
-        }
-        .apply_checksum()
-    }
-
-    fn from_bytes(bytes: &[u8]) -> Self {
-        assert_eq!(bytes.len(), 8);
-        unsafe { transmute::<[u8; 8], Self>(bytes.try_into().unwrap()) }
-    }
-}
-
-impl Checksummable for IcmpEcho {
-    fn set_checksum(&mut self, checksum: u16be) {
-        self.checksum = checksum;
-    }
-}
 
 #[cfg(test)]
 mod tests {
