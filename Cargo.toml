@@ -6,7 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+hex = "0.4.3"
 libc = "0.2.148"
 nix = { version = "0.27.1", features = ["ioctl"] }
 simple_endian = "0.2.1"
+test-case = "3.2.1"
 timeout-readwrite = "0.3.3"

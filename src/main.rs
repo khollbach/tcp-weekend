@@ -172,18 +172,10 @@ fn checksum(bytes: &[u8]) -> u16 {
             (part[0] as u16) << 8
         } else {
             u16::from_be_bytes(part.try_into().unwrap())
-        }
-        .into();
+        };
 
         let (sum, carry) = result.overflowing_add(part);
         result = sum + (carry as u16);
-
-        // let result_u16: u16 = result.into();
-        // let (sum, carry) = result_u16.overflowing_add(part.to_native());
-        // result = (sum + (carry as u16)).into();
-
-        // let result_u16: u16 = result.into();
-        // result = result_u16.wrapping_add(part.into()).into();
     }
 
     !result
@@ -238,6 +230,7 @@ impl Checksummable for IcmpEcho {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use test_case::test_case;
 
     #[test]
     fn ipv4_to_bytes() {
@@ -255,6 +248,16 @@ mod tests {
         };
         let expected = b"E\x00\x00\x1c\x00\x01\x00\x00\x10\x06\x00\x00\xc0\xa8\x00\x01\x08\x08\x08\x08";
         assert_eq!(ipv4.as_bytes(), expected);
+    }
+
+    #[test_case(b"11aabbccddee123412341234", 7678)]
+    #[test_case(b"01", 0xfeff)]
+    #[test_case(b"0001", 0xfffe)]
+    #[test_case(b"00010001", 0xfffd)]
+    #[test_case(b"11aabbccddee1234123412341dfe", 0)]
+    fn checksum(data: &[u8], expected: u16) {
+        let data = hex::decode(data).unwrap();
+        assert_eq!(super::checksum(&data), expected);
     }
 
     #[test]

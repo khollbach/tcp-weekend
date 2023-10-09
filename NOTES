@@ -25,4 +25,8 @@ Part 1:
     doesn't exactly correspond to the fields in the python dataclass
 * 1.4: to/from bytestrings:
     got tripped up by endianness, but we eventually figured it out
-
+    (btw the byte-order section in the guide is great -- I don't think saw that until after)
+* 1.5:
+    > When we add the two bytes corresponding to “7678” to the end of the data, the checksum of the resuult will always be 0
+    (typo: resuult)
+    This seems confusingly worded. Appending the checksum to the data makes sense -- but this makes it sound like the checksum of *any* arbitrary data will always be 7678, which isn't the case.
