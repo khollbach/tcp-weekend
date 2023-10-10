@@ -8,16 +8,16 @@ use crate::checksum::Checksummable;
 #[repr(C)]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Ipv4 {
-    vers_ihl: u8,
-    tos: u8,
-    total_length: u16be,
-    id: u16be,
-    frag_off: u16be,
-    ttl: u8,
-    protocol: u8,
-    checksum: u16be,
-    src: Ipv4Addr,
-    dst: Ipv4Addr,
+    pub vers_ihl: u8,
+    pub tos: u8,
+    pub total_length: u16be,
+    pub id: u16be,
+    pub frag_off: u16be,
+    pub ttl: u8,
+    pub protocol: u8,
+    pub checksum: u16be,
+    pub src: Ipv4Addr,
+    pub dst: Ipv4Addr,
 }
 
 impl fmt::Debug for Ipv4 {
@@ -70,6 +70,7 @@ impl Checksummable for Ipv4 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::checksum::AsBytes;
 
     #[test]
     fn ipv4_to_bytes() {

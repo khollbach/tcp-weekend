@@ -2,14 +2,40 @@ use std::{mem, slice};
 
 use simple_endian::u16be;
 
-pub trait Checksummable: Sized {
+pub trait AsBytes {
+    fn as_bytes(&self) -> &[u8];
+
+    fn concat<T>(&self, other: &T) -> Vec<u8>
+    where
+        T: AsBytes + ?Sized,
+    {
+        self.as_bytes()
+            .iter()
+            .chain(other.as_bytes())
+            .copied()
+            .collect()
+    }
+}
+
+impl<T> AsBytes for T
+where
+    T: Sized,
+{
     fn as_bytes(&self) -> &[u8] {
         unsafe {
             let ptr = self as *const Self as *const u8;
             slice::from_raw_parts(ptr, mem::size_of::<Self>())
         }
     }
+}
 
+impl AsBytes for [u8] {
+    fn as_bytes(&self) -> &[u8] {
+        self
+    }
+}
+
+pub trait Checksummable: AsBytes + Sized {
     fn set_checksum(&mut self, checksum: u16be);
 
     fn apply_checksum(mut self) -> Self {
@@ -20,7 +46,7 @@ pub trait Checksummable: Sized {
     }
 }
 
-fn checksum(bytes: &[u8]) -> u16 {
+pub fn checksum(bytes: &[u8]) -> u16 {
     let mut result: u16 = 0;
 
     for part in bytes.chunks(2) {

@@ -53,6 +53,7 @@ impl Checksummable for IcmpEcho {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::checksum::AsBytes;
 
     #[test]
     fn make_ping() {

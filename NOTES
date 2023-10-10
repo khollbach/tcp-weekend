@@ -30,3 +30,6 @@ Part 1:
     > When we add the two bytes corresponding to “7678” to the end of the data, the checksum of the resuult will always be 0
     (typo: resuult)
     This seems confusingly worded. Appending the checksum to the data makes sense -- but this makes it sound like the checksum of *any* arbitrary data will always be 7678, which isn't the case.
+
+1.2.2
+* Please add example checksum to this section as well -- they were super helpful in the prev sections!
