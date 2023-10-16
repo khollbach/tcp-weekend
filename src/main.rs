@@ -42,13 +42,13 @@ fn send_dns(tun: &mut File) -> Result<()> {
     // Send a DNS query
     let query =
         b"D\xcb\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x07example\x03com\x00\x00\x01\x00\x01";
-    // let packet = new_udp_packet([8, 8, 8, 8].into(), 12345, 53, query);
-    let packet = new_udp_packet([192, 0, 2, 1].into(), 12345, 53, query);
+    let packet = new_udp_packet([8, 8, 8, 8].into(), 12345, 53, query);
+    // let packet = new_udp_packet([192, 0, 2, 1].into(), 12345, 53, query);
 
     let expected = hex::decode("45000039000100004011a8a1c000020208080808303900350025e8ea44cb01000001000000000000076578616d706c6503636f6d0000010001")?;
     eprintln!("packet\n {:02x?}\n", packet);
     eprintln!("expected\n {:02x?}\n", expected);
-    // assert_eq!(packet, expected);
+    assert_eq!(packet, expected);
     tun.write_all(&packet).context("tun write_all")?;
     tun.flush().context("tun flush")?;
 
@@ -59,9 +59,16 @@ fn send_dns(tun: &mut File) -> Result<()> {
     // assert_eq!(n, 32);
     let ipv4_resp = Ipv4::from_bytes(&buf[..20]);
     let udp = UdpHeader::from_bytes(&buf[20..28]);
-    let contents = &buf[28..32];
+    // let contents = &buf[28..32];
+    // !!! we were assuming the contents len was 4, but actually it was longer
+    // whoops.
+    let contents = &buf[n-4..n];
     dbg!(ipv4_resp, udp);
-    eprintln!("contents {contents:02x?}");
+    // eprintln!("contents {contents:02x?}");
+    eprintln!("contents {contents:?}");
+
+    // expected contents:
+    // 93 184 216 34
 
     Ok(())
 }

@@ -33,3 +33,6 @@ Part 1:
 
 1.2.2
 * Please add example checksum to this section as well -- they were super helpful in the prev sections!
+    (checksum code is where we're finding a lot of our bugs)
+
+---
