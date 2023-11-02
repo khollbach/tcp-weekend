@@ -3,6 +3,7 @@ mod checksum;
 mod ipv4;
 mod icmp_echo;
 mod udp;
+mod tcp;
 
 use std::{fs::File, io::prelude::*, mem, net::Ipv4Addr, time::Duration};
 
@@ -62,7 +63,7 @@ fn send_dns(tun: &mut File) -> Result<()> {
     // let contents = &buf[28..32];
     // !!! we were assuming the contents len was 4, but actually it was longer
     // whoops.
-    let contents = &buf[n-4..n];
+    let contents = &buf[n - 4..n];
     dbg!(ipv4_resp, udp);
     // eprintln!("contents {contents:02x?}");
     eprintln!("contents {contents:?}");
